@@ -40,7 +40,6 @@ class Reference
     public int StartVerse { get; }
     public int? EndVerse { get; }
 
-    // Constructor for single verse
     public Reference(string book, int chapter, int verse)
     {
         Book = book;
@@ -49,7 +48,6 @@ class Reference
         EndVerse = null;
     }
 
-    // Constructor for verse range
     public Reference(string book, int chapter, int startVerse, int endVerse)
     {
         Book = book;
@@ -69,7 +67,7 @@ class Reference
 // Class to represent individual words in the scripture
 class Word
 {
-    private string Text { get; }
+    private string Text { get; } // Encapsulated text
     public bool IsHidden { get; private set; }
 
     public Word(string text)
@@ -78,6 +76,7 @@ class Word
         IsHidden = false;
     }
 
+    // Method to hide the word
     public void Hide()
     {
         IsHidden = true;
@@ -103,17 +102,19 @@ class Scripture
         Random = new Random();
     }
 
+    // Displays the scripture with the current state of the words
     public string Display()
     {
         return $"{Reference}\n{string.Join(" ", Words)}";
     }
 
+    // Hides random visible words
     public void HideRandomWords()
     {
         List<Word> visibleWords = Words.Where(word => !word.IsHidden).ToList();
         if (visibleWords.Any())
         {
-            int wordsToHide = Math.Min(3, visibleWords.Count); // Hide up to 3 words at a time
+            int wordsToHide = Math.Min(3, visibleWords.Count); // Hide up to 3 words
             for (int i = 0; i < wordsToHide; i++)
             {
                 Word wordToHide = visibleWords[Random.Next(visibleWords.Count)];
@@ -123,6 +124,7 @@ class Scripture
         }
     }
 
+    // Checks if all words are hidden
     public bool AllWordsHidden()
     {
         return Words.All(word => word.IsHidden);
