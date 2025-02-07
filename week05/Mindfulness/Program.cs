@@ -1,74 +1,146 @@
-// Base class Assignment
-public class Assignment
-{
-    protected string _studentName;
-    protected string _topic;
+using System;
+using System.Collections.Generic;
+using System.Threading;
 
-    public Assignment(string studentName, string topic)
+// Base class Activity
+public abstract class Activity
+{
+    protected string _name;
+    protected string _description;
+    protected int _duration;
+
+    public Activity(string name, string description)
     {
-        _studentName = studentName;
-        _topic = topic;
+        _name = name;
+        _description = description;
     }
 
-    public string GetSummary()
+    public void Start()
     {
-        return $"{_studentName} - {_topic}";
+        Console.WriteLine($"Starting {_name}");
+        Console.WriteLine(_description);
+        Console.Write("Enter duration (seconds): ");
+        _duration = int.Parse(Console.ReadLine());
+        Console.WriteLine("Prepare to begin...");
+        Thread.Sleep(3000);
+        RunActivity();
+        Console.WriteLine($"Good job! You completed {_name} for {_duration} seconds.");
+        Thread.Sleep(3000);
+    }
+
+    protected abstract void RunActivity();
+}
+
+// Breathing Activity
+public class BreathingActivity : Activity
+{
+    public BreathingActivity() : base("Breathing Activity", "This activity helps you relax by guiding you through breathing exercises.") { }
+
+    protected override void RunActivity()
+    {
+        for (int i = 0; i < _duration / 6; i++)
+        {
+            Console.WriteLine("Breathe in...");
+            Thread.Sleep(3000);
+            Console.WriteLine("Breathe out...");
+            Thread.Sleep(3000);
+        }
     }
 }
 
-// Derived class MathAssignment
-public class MathAssignment : Assignment
+// Reflection Activity
+public class ReflectionActivity : Activity
 {
-    private string _textbookSection;
-    private string _problems;
-
-    public MathAssignment(string studentName, string topic, string textbookSection, string problems)
-        : base(studentName, topic)
+    private static readonly List<string> _prompts = new List<string>
     {
-        _textbookSection = textbookSection;
-        _problems = problems;
-    }
+        "Think of a time when you stood up for someone else.",
+        "Think of a time when you did something really difficult.",
+        "Think of a time when you helped someone in need."
+    };
 
-    public string GetHomeworkList()
+    private static readonly List<string> _questions = new List<string>
     {
-        return $"Section {_textbookSection} Problems {_problems}";
+        "Why was this experience meaningful to you?",
+        "Have you ever done anything like this before?",
+        "How did you feel when it was complete?"
+    };
+
+    public ReflectionActivity() : base("Reflection Activity", "This activity helps you reflect on your strengths and resilience.") { }
+
+    protected override void RunActivity()
+    {
+        Random random = new Random();
+        Console.WriteLine(_prompts[random.Next(_prompts.Count)]);
+        Thread.Sleep(3000);
+        
+        for (int i = 0; i < _duration / 6; i++)
+        {
+            Console.WriteLine(_questions[random.Next(_questions.Count)]);
+            Thread.Sleep(6000);
+        }
     }
 }
 
-// Derived class WritingAssignment
-public class WritingAssignment : Assignment
+// Listing Activity
+public class ListingActivity : Activity
 {
-    private string _title;
-
-    public WritingAssignment(string studentName, string topic, string title)
-        : base(studentName, topic)
+    private static readonly List<string> _prompts = new List<string>
     {
-        _title = title;
-    }
+        "Who are people that you appreciate?",
+        "What are personal strengths of yours?",
+        "Who are some of your personal heroes?"
+    };
 
-    public string GetWritingInformation()
+    public ListingActivity() : base("Listing Activity", "This activity helps you focus on positivity by listing good things in your life.") { }
+
+    protected override void RunActivity()
     {
-        return $"{_title} by {_studentName}";
+        Random random = new Random();
+        Console.WriteLine(_prompts[random.Next(_prompts.Count)]);
+        Thread.Sleep(3000);
+        
+        Console.WriteLine("Start listing items...");
+        List<string> items = new List<string>();
+        DateTime endTime = DateTime.Now.AddSeconds(_duration);
+        
+        while (DateTime.Now < endTime)
+        {
+            string item = Console.ReadLine();
+            if (!string.IsNullOrEmpty(item)) items.Add(item);
+        }
+        
+        Console.WriteLine($"You listed {items.Count} items!");
     }
 }
 
-// Main program
+// Main Program
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Testing Assignment base class
-        Assignment assignment = new Assignment("Samuel Bennett", "Multiplication");
-        Console.WriteLine(assignment.GetSummary());
-        
-        // Testing MathAssignment
-        MathAssignment mathAssignment = new MathAssignment("Roberto Rodriguez", "Fractions", "7.3", "8-19");
-        Console.WriteLine(mathAssignment.GetSummary());
-        Console.WriteLine(mathAssignment.GetHomeworkList());
+        while (true)
+        {
+            Console.Clear();
+            Console.WriteLine("Mindfulness App");
+            Console.WriteLine("1. Breathing Activity");
+            Console.WriteLine("2. Reflection Activity");
+            Console.WriteLine("3. Listing Activity");
+            Console.WriteLine("4. Exit");
+            Console.Write("Choose an activity: ");
 
-        // Testing WritingAssignment
-        WritingAssignment writingAssignment = new WritingAssignment("Mary Waters", "European History", "The Causes of World War II");
-        Console.WriteLine(writingAssignment.GetSummary());
-        Console.WriteLine(writingAssignment.GetWritingInformation());
+            string choice = Console.ReadLine();
+            Activity activity = null;
+
+            switch (choice)
+            {
+                case "1": activity = new BreathingActivity(); break;
+                case "2": activity = new ReflectionActivity(); break;
+                case "3": activity = new ListingActivity(); break;
+                case "4": return;
+                default: Console.WriteLine("Invalid choice."); continue;
+            }
+
+            activity.Start();
+        }
     }
 }
